@@ -1,5 +1,6 @@
 package vista;
 
+import dao.PedidoDAO;
 import modelo.GestorPedidos;
 import modelo.Pedido;
 import modelo.PedidoComida;
@@ -12,18 +13,20 @@ import java.awt.*;
 public class VentanaRegistroPedido extends JFrame {
 
     private final GestorPedidos gestorPedidos;
+    private final PedidoDAO pedidoDAO;
 
-    private JTextField txtId;
     private JTextField txtDireccion;
     private JComboBox<String> cmbTipo;
     private JButton btnGuardar;
     private JButton btnVolver;
 
     public VentanaRegistroPedido(GestorPedidos gestorPedidos) {
+
         this.gestorPedidos = gestorPedidos;
+        this.pedidoDAO = new PedidoDAO();
 
         setTitle("SpeedFast - Registrar Pedido");
-        setSize(450, 330);
+        setSize(450, 280);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -33,10 +36,16 @@ public class VentanaRegistroPedido extends JFrame {
 
     private void inicializarComponentes() {
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
+        JPanel panelPrincipal =
+                new JPanel(new BorderLayout(10, 10));
 
         panelPrincipal.setBorder(
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(
+                        20,
+                        20,
+                        20,
+                        20
+                )
         );
 
         JLabel lblTitulo = new JLabel(
@@ -45,29 +54,39 @@ public class VentanaRegistroPedido extends JFrame {
         );
 
         lblTitulo.setFont(
-                new Font("Arial", Font.BOLD, 20)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        20
+                )
         );
 
-        JPanel panelFormulario = new JPanel(
-                new GridLayout(3, 2, 10, 10)
+        JPanel panelFormulario =
+                new JPanel(
+                        new GridLayout(
+                                2,
+                                2,
+                                10,
+                                10
+                        )
+                );
+
+        JLabel lblDireccion =
+                new JLabel("Dirección:");
+
+        txtDireccion =
+                new JTextField();
+
+        JLabel lblTipo =
+                new JLabel("Tipo de pedido:");
+
+        cmbTipo = new JComboBox<>(
+                new String[]{
+                        "Comida",
+                        "Encomienda",
+                        "Express"
+                }
         );
-
-        JLabel lblId = new JLabel("ID:");
-        txtId = new JTextField();
-
-        JLabel lblDireccion = new JLabel("Dirección:");
-        txtDireccion = new JTextField();
-
-        JLabel lblTipo = new JLabel("Tipo de pedido:");
-
-        cmbTipo = new JComboBox<>(new String[]{
-                "Comida",
-                "Encomienda",
-                "Express"
-        });
-
-        panelFormulario.add(lblId);
-        panelFormulario.add(txtId);
 
         panelFormulario.add(lblDireccion);
         panelFormulario.add(txtDireccion);
@@ -75,20 +94,29 @@ public class VentanaRegistroPedido extends JFrame {
         panelFormulario.add(lblTipo);
         panelFormulario.add(cmbTipo);
 
-        btnGuardar = new JButton("Guardar Pedido");
-        btnVolver = new JButton("Volver al Menú");
+        btnGuardar =
+                new JButton("Guardar Pedido");
 
-        btnGuardar.addActionListener(e ->
-                guardarPedido()
+        btnVolver =
+                new JButton("Volver al Menú");
+
+        btnGuardar.addActionListener(
+                e -> guardarPedido()
         );
 
-        btnVolver.addActionListener(e ->
-                dispose()
+        btnVolver.addActionListener(
+                e -> dispose()
         );
 
-        JPanel panelBotones = new JPanel(
-                new GridLayout(1, 2, 10, 0)
-        );
+        JPanel panelBotones =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                2,
+                                10,
+                                0
+                        )
+                );
 
         panelBotones.add(btnGuardar);
         panelBotones.add(btnVolver);
@@ -113,60 +141,15 @@ public class VentanaRegistroPedido extends JFrame {
 
     private void guardarPedido() {
 
-        String idTexto =
-                txtId.getText().trim();
-
         String direccion =
                 txtDireccion.getText().trim();
 
-        if (idTexto.isEmpty() || direccion.isEmpty()) {
+        if (direccion.isEmpty()) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Debe completar todos los campos.",
-                    "Campos incompletos",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        int id;
-
-        try {
-
-            id = Integer.parseInt(idTexto);
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El ID debe ser un número entero.",
-                    "ID inválido",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (id <= 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El ID debe ser mayor que cero.",
-                    "ID inválido",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        if (gestorPedidos.existeId(id)) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Ya existe un pedido con ese ID.",
-                    "ID duplicado",
+                    "Debe ingresar una dirección.",
+                    "Campo incompleto",
                     JOptionPane.WARNING_MESSAGE
             );
 
@@ -181,27 +164,33 @@ public class VentanaRegistroPedido extends JFrame {
         switch (tipo) {
 
             case "Comida":
+
                 pedido = new PedidoComida(
-                        id,
+                        0,
                         direccion,
                         0.0
                 );
+
                 break;
 
             case "Encomienda":
+
                 pedido = new PedidoEncomienda(
-                        id,
+                        0,
                         direccion,
                         0.0
                 );
+
                 break;
 
             case "Express":
+
                 pedido = new PedidoExpress(
-                        id,
+                        0,
                         direccion,
                         0.0
                 );
+
                 break;
 
             default:
@@ -216,11 +205,30 @@ public class VentanaRegistroPedido extends JFrame {
                 return;
         }
 
-        gestorPedidos.agregarPedido(pedido);
+        boolean guardado =
+                pedidoDAO.guardar(pedido);
+
+        if (!guardado) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudo guardar el pedido en la base de datos.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        gestorPedidos.agregarPedido(
+                pedido
+        );
 
         JOptionPane.showMessageDialog(
                 this,
-                "Pedido registrado correctamente.",
+                "Pedido registrado correctamente.\n"
+                        + "ID generado: "
+                        + pedido.getId(),
                 "Registro exitoso",
                 JOptionPane.INFORMATION_MESSAGE
         );
@@ -230,11 +238,10 @@ public class VentanaRegistroPedido extends JFrame {
 
     private void limpiarCampos() {
 
-        txtId.setText("");
         txtDireccion.setText("");
 
         cmbTipo.setSelectedIndex(0);
 
-        txtId.requestFocus();
+        txtDireccion.requestFocus();
     }
 }

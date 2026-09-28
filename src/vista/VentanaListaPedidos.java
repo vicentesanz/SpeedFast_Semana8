@@ -1,15 +1,17 @@
 package vista;
 
+import dao.PedidoDAO;
 import modelo.GestorPedidos;
 import modelo.Pedido;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class VentanaListaPedidos extends JFrame {
 
-    private final GestorPedidos gestorPedidos;
+    private final PedidoDAO pedidoDAO;
 
     private JTable tablaPedidos;
     private DefaultTableModel modeloTabla;
@@ -17,7 +19,8 @@ public class VentanaListaPedidos extends JFrame {
     private JButton btnVolver;
 
     public VentanaListaPedidos(GestorPedidos gestorPedidos) {
-        this.gestorPedidos = gestorPedidos;
+
+        this.pedidoDAO = new PedidoDAO();
 
         setTitle("SpeedFast - Lista de Pedidos");
         setSize(700, 420);
@@ -30,10 +33,16 @@ public class VentanaListaPedidos extends JFrame {
 
     private void inicializarComponentes() {
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
+        JPanel panelPrincipal =
+                new JPanel(new BorderLayout(10, 10));
 
         panelPrincipal.setBorder(
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(
+                        20,
+                        20,
+                        20,
+                        20
+                )
         );
 
         JLabel lblTitulo = new JLabel(
@@ -42,7 +51,11 @@ public class VentanaListaPedidos extends JFrame {
         );
 
         lblTitulo.setFont(
-                new Font("Arial", Font.BOLD, 20)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        20
+                )
         );
 
         modeloTabla = new DefaultTableModel(
@@ -55,13 +68,18 @@ public class VentanaListaPedidos extends JFrame {
                 },
                 0
         ) {
+
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
                 return false;
             }
         };
 
-        tablaPedidos = new JTable(modeloTabla);
+        tablaPedidos =
+                new JTable(modeloTabla);
 
         tablaPedidos.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
@@ -76,17 +94,23 @@ public class VentanaListaPedidos extends JFrame {
         btnVolver =
                 new JButton("Volver al Menú");
 
-        btnActualizar.addActionListener(e ->
-                actualizarTabla()
+        btnActualizar.addActionListener(
+                e -> actualizarTabla()
         );
 
-        btnVolver.addActionListener(e ->
-                dispose()
+        btnVolver.addActionListener(
+                e -> dispose()
         );
 
-        JPanel panelBotones = new JPanel(
-                new GridLayout(1, 2, 10, 0)
-        );
+        JPanel panelBotones =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                2,
+                                10,
+                                0
+                        )
+                );
 
         panelBotones.add(btnActualizar);
         panelBotones.add(btnVolver);
@@ -113,12 +137,19 @@ public class VentanaListaPedidos extends JFrame {
 
         modeloTabla.setRowCount(0);
 
-        for (Pedido pedido : gestorPedidos.getPedidos()) {
+        List<Pedido> pedidos =
+                pedidoDAO.listarTodos();
 
-            String tipoPedido = pedido
-                    .getClass()
-                    .getSimpleName()
-                    .replace("Pedido", "");
+        for (Pedido pedido : pedidos) {
+
+            String tipoPedido =
+                    pedido
+                            .getClass()
+                            .getSimpleName()
+                            .replace(
+                                    "Pedido",
+                                    ""
+                            );
 
             modeloTabla.addRow(
                     new Object[]{
