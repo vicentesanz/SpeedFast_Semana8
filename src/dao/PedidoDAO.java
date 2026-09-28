@@ -84,8 +84,21 @@ public class PedidoDAO {
                 new ArrayList<>();
 
         String sql =
-                "SELECT id, direccion, tipo, estado "
-                        + "FROM pedido ORDER BY id";
+                "SELECT " +
+                        "p.id, " +
+                        "p.direccion, " +
+                        "p.tipo, " +
+                        "p.estado, " +
+                        "r.nombre AS repartidor " +
+                        "FROM pedido p " +
+                        "LEFT JOIN entrega e ON e.id = (" +
+                        "SELECT MAX(e2.id) " +
+                        "FROM entrega e2 " +
+                        "WHERE e2.id_pedido = p.id" +
+                        ") " +
+                        "LEFT JOIN repartidor r " +
+                        "ON r.id = e.id_repartidor " +
+                        "ORDER BY p.id";
 
         try (
                 Connection conexion = ConexionBD.conectar();
@@ -108,6 +121,9 @@ public class PedidoDAO {
 
                 String estado =
                         resultado.getString("estado");
+
+                String repartidor =
+                        resultado.getString("repartidor");
 
                 Pedido pedido;
 
@@ -156,6 +172,16 @@ public class PedidoDAO {
                 pedido.setEstado(
                         estado
                 );
+
+                if (
+                        repartidor != null
+                                && !repartidor.isBlank()
+                ) {
+
+                    pedido.asignarRepartidor(
+                            repartidor
+                    );
+                }
 
                 pedidos.add(
                         pedido
