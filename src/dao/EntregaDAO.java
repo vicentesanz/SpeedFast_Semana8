@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntregaDAO {
 
@@ -74,6 +76,136 @@ public class EntregaDAO {
 
             System.out.println(
                     "Error al guardar la entrega: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+    public List<Entrega> listarTodas() {
+
+        List<Entrega> entregas =
+                new ArrayList<>();
+
+        String sql =
+                "SELECT id, id_pedido, id_repartidor, fecha, hora " +
+                        "FROM entrega ORDER BY id";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql);
+                ResultSet resultado =
+                        statement.executeQuery()
+        ) {
+
+            while (resultado.next()) {
+
+                Entrega entrega =
+                        new Entrega(
+                                resultado.getInt("id"),
+                                resultado.getInt("id_pedido"),
+                                resultado.getInt("id_repartidor"),
+                                resultado.getDate("fecha").toLocalDate(),
+                                resultado.getTime("hora").toLocalTime()
+                        );
+
+                entregas.add(
+                        entrega
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al listar las entregas: "
+                            + e.getMessage()
+            );
+        }
+
+        return entregas;
+    }
+
+    public boolean actualizar(Entrega entrega) {
+
+        String sql =
+                "UPDATE entrega " +
+                        "SET id_pedido = ?, id_repartidor = ?, fecha = ?, hora = ? " +
+                        "WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    entrega.getIdPedido()
+            );
+
+            statement.setInt(
+                    2,
+                    entrega.getIdRepartidor()
+            );
+
+            statement.setDate(
+                    3,
+                    Date.valueOf(entrega.getFecha())
+            );
+
+            statement.setTime(
+                    4,
+                    Time.valueOf(entrega.getHora())
+            );
+
+            statement.setInt(
+                    5,
+                    entrega.getId()
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al actualizar la entrega: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+    public boolean eliminar(int id) {
+
+        String sql =
+                "DELETE FROM entrega WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    id
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al eliminar la entrega: "
                             + e.getMessage()
             );
 
