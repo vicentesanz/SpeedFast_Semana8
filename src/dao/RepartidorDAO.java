@@ -12,6 +12,8 @@ import java.util.List;
 
 public class RepartidorDAO {
 
+    // Registra un nuevo repartidor en la base de datos
+    // y recupera el ID generado automáticamente.
     public boolean guardar(Repartidor repartidor) {
 
         String sql =
@@ -64,6 +66,8 @@ public class RepartidorDAO {
         }
     }
 
+    // Obtiene todos los repartidores almacenados
+    // y los transforma en objetos Repartidor.
     public List<Repartidor> listarTodos() {
 
         List<Repartidor> repartidores =
@@ -109,6 +113,7 @@ public class RepartidorDAO {
         return repartidores;
     }
 
+    // Actualiza el nombre de un repartidor utilizando su ID.
     public boolean actualizar(Repartidor repartidor) {
 
         String sql =
@@ -146,6 +151,7 @@ public class RepartidorDAO {
         }
     }
 
+    // Elimina un repartidor según su ID.
     public boolean eliminar(int id) {
 
         String sql =

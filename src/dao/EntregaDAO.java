@@ -14,6 +14,8 @@ import java.util.List;
 
 public class EntregaDAO {
 
+    // Registra una nueva entrega asociando
+    // un pedido y un repartidor con fecha y hora.
     public boolean guardar(Entrega entrega) {
 
         String sql =
@@ -83,6 +85,8 @@ public class EntregaDAO {
         }
     }
 
+    // Obtiene todas las entregas almacenadas
+    // y las transforma en objetos Entrega.
     public List<Entrega> listarTodas() {
 
         List<Entrega> entregas =
@@ -127,6 +131,8 @@ public class EntregaDAO {
         return entregas;
     }
 
+    // Actualiza el pedido, repartidor, fecha y hora
+    // de una entrega existente.
     public boolean actualizar(Entrega entrega) {
 
         String sql =
@@ -181,6 +187,7 @@ public class EntregaDAO {
         }
     }
 
+    // Elimina una entrega según su ID.
     public boolean eliminar(int id) {
 
         String sql =

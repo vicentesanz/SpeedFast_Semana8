@@ -15,6 +15,8 @@ import java.util.List;
 
 public class PedidoDAO {
 
+    // Registra un nuevo pedido en la base de datos
+    // y recupera el ID generado automáticamente.
     public boolean guardar(Pedido pedido) {
 
         String sql =
@@ -78,6 +80,8 @@ public class PedidoDAO {
         }
     }
 
+    // Obtiene todos los pedidos almacenados y carga,
+    // cuando corresponde, el repartidor asociado a la entrega.
     public List<Pedido> listarTodos() {
 
         List<Pedido> pedidos =
@@ -199,6 +203,8 @@ public class PedidoDAO {
         return pedidos;
     }
 
+    // Actualiza la dirección, el tipo y el estado
+    // de un pedido existente.
     public boolean actualizar(Pedido pedido) {
 
         String sql =
@@ -248,6 +254,7 @@ public class PedidoDAO {
         }
     }
 
+    // Elimina un pedido según su ID.
     public boolean eliminar(int id) {
 
         String sql =
@@ -280,6 +287,8 @@ public class PedidoDAO {
         }
     }
 
+    // Actualiza únicamente el estado del pedido.
+    // Se utiliza, por ejemplo, al registrar una entrega.
     public boolean actualizarEstado(
             int idPedido,
             String nuevoEstado
@@ -320,6 +329,7 @@ public class PedidoDAO {
         }
     }
 
+    // Determina el tipo de pedido según la subclase utilizada.
     private String obtenerTipo(
             Pedido pedido
     ) {
