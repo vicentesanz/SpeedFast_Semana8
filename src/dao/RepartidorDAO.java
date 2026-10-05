@@ -108,4 +108,73 @@ public class RepartidorDAO {
 
         return repartidores;
     }
+
+    public boolean actualizar(Repartidor repartidor) {
+
+        String sql =
+                "UPDATE repartidor SET nombre = ? WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setString(
+                    1,
+                    repartidor.getNombre()
+            );
+
+            statement.setInt(
+                    2,
+                    repartidor.getId()
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al actualizar el repartidor: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+    public boolean eliminar(int id) {
+
+        String sql =
+                "DELETE FROM repartidor WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    id
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al eliminar el repartidor: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
 }
