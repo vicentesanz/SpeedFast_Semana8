@@ -28,6 +28,9 @@ public class VentanaGestionEntregas extends JFrame {
     private JComboBox<String> cmbPedido;
     private JComboBox<String> cmbRepartidor;
 
+    private JComboBox<String> cmbFiltroPedido;
+    private JComboBox<String> cmbFiltroRepartidor;
+
     private JTextField txtFecha;
     private JTextField txtHora;
 
@@ -40,6 +43,8 @@ public class VentanaGestionEntregas extends JFrame {
     private JButton btnLimpiar;
     private JButton btnVolver;
 
+    private boolean cargandoFiltros;
+
     public VentanaGestionEntregas() {
 
         entregaDAO = new EntregaDAO();
@@ -47,7 +52,7 @@ public class VentanaGestionEntregas extends JFrame {
         repartidorDAO = new RepartidorDAO();
 
         setTitle("SpeedFast - Gestión de Entregas");
-        setSize(900, 550);
+        setSize(950, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -100,14 +105,10 @@ public class VentanaGestionEntregas extends JFrame {
                 );
 
         JLabel lblPedido =
-                new JLabel(
-                        "Pedido:"
-                );
+                new JLabel("Pedido:");
 
         JLabel lblRepartidor =
-                new JLabel(
-                        "Repartidor:"
-                );
+                new JLabel("Repartidor:");
 
         JLabel lblFecha =
                 new JLabel(
@@ -131,36 +132,76 @@ public class VentanaGestionEntregas extends JFrame {
         txtHora =
                 new JTextField();
 
-        panelFormulario.add(
-                lblPedido
+        panelFormulario.add(lblPedido);
+        panelFormulario.add(cmbPedido);
+
+        panelFormulario.add(lblRepartidor);
+        panelFormulario.add(cmbRepartidor);
+
+        panelFormulario.add(lblFecha);
+        panelFormulario.add(txtFecha);
+
+        panelFormulario.add(lblHora);
+        panelFormulario.add(txtHora);
+
+        JPanel panelFiltros =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                4,
+                                10,
+                                10
+                        )
+                );
+
+        JLabel lblFiltroPedido =
+                new JLabel(
+                        "Filtrar por pedido:"
+                );
+
+        JLabel lblFiltroRepartidor =
+                new JLabel(
+                        "Filtrar por repartidor:"
+                );
+
+        cmbFiltroPedido =
+                new JComboBox<>();
+
+        cmbFiltroRepartidor =
+                new JComboBox<>();
+
+        cmbFiltroPedido.addActionListener(
+                e -> {
+
+                    if (!cargandoFiltros) {
+                        cargarTabla();
+                    }
+                }
         );
 
-        panelFormulario.add(
-                cmbPedido
+        cmbFiltroRepartidor.addActionListener(
+                e -> {
+
+                    if (!cargandoFiltros) {
+                        cargarTabla();
+                    }
+                }
         );
 
-        panelFormulario.add(
-                lblRepartidor
+        panelFiltros.add(
+                lblFiltroPedido
         );
 
-        panelFormulario.add(
-                cmbRepartidor
+        panelFiltros.add(
+                cmbFiltroPedido
         );
 
-        panelFormulario.add(
-                lblFecha
+        panelFiltros.add(
+                lblFiltroRepartidor
         );
 
-        panelFormulario.add(
-                txtFecha
-        );
-
-        panelFormulario.add(
-                lblHora
-        );
-
-        panelFormulario.add(
-                txtHora
+        panelFiltros.add(
+                cmbFiltroRepartidor
         );
 
         JPanel panelSuperior =
@@ -179,6 +220,11 @@ public class VentanaGestionEntregas extends JFrame {
         panelSuperior.add(
                 panelFormulario,
                 BorderLayout.CENTER
+        );
+
+        panelSuperior.add(
+                panelFiltros,
+                BorderLayout.SOUTH
         );
 
         modeloTabla =
@@ -223,29 +269,19 @@ public class VentanaGestionEntregas extends JFrame {
                 );
 
         btnRegistrar =
-                new JButton(
-                        "Registrar"
-                );
+                new JButton("Registrar");
 
         btnActualizar =
-                new JButton(
-                        "Actualizar"
-                );
+                new JButton("Actualizar");
 
         btnEliminar =
-                new JButton(
-                        "Eliminar"
-                );
+                new JButton("Eliminar");
 
         btnLimpiar =
-                new JButton(
-                        "Limpiar"
-                );
+                new JButton("Limpiar");
 
         btnVolver =
-                new JButton(
-                        "Volver"
-                );
+                new JButton("Volver");
 
         btnRegistrar.addActionListener(
                 e -> registrarEntrega()
@@ -277,25 +313,11 @@ public class VentanaGestionEntregas extends JFrame {
                         )
                 );
 
-        panelBotones.add(
-                btnRegistrar
-        );
-
-        panelBotones.add(
-                btnActualizar
-        );
-
-        panelBotones.add(
-                btnEliminar
-        );
-
-        panelBotones.add(
-                btnLimpiar
-        );
-
-        panelBotones.add(
-                btnVolver
-        );
+        panelBotones.add(btnRegistrar);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
+        panelBotones.add(btnVolver);
 
         panelPrincipal.add(
                 panelSuperior,
@@ -312,9 +334,7 @@ public class VentanaGestionEntregas extends JFrame {
                 BorderLayout.SOUTH
         );
 
-        add(
-                panelPrincipal
-        );
+        add(panelPrincipal);
     }
 
     private void cargarDatos() {
@@ -332,40 +352,133 @@ public class VentanaGestionEntregas extends JFrame {
         repartidores =
                 repartidorDAO.listarTodos();
 
+        cargandoFiltros = true;
+
         cmbPedido.removeAllItems();
         cmbRepartidor.removeAllItems();
 
+        cmbFiltroPedido.removeAllItems();
+        cmbFiltroRepartidor.removeAllItems();
+
+        cmbFiltroPedido.addItem(
+                "Todos"
+        );
+
+        cmbFiltroRepartidor.addItem(
+                "Todos"
+        );
+
         for (Pedido pedido : pedidos) {
 
-            cmbPedido.addItem(
+            String textoPedido =
                     "Pedido #"
                             + pedido.getId()
                             + " - "
-                            + pedido.getDireccionEntrega()
+                            + pedido.getDireccionEntrega();
+
+            cmbPedido.addItem(
+                    textoPedido
+            );
+
+            cmbFiltroPedido.addItem(
+                    textoPedido
             );
         }
 
         for (Repartidor repartidor : repartidores) {
 
-            cmbRepartidor.addItem(
+            String textoRepartidor =
                     "Repartidor #"
                             + repartidor.getId()
                             + " - "
-                            + repartidor.getNombre()
+                            + repartidor.getNombre();
+
+            cmbRepartidor.addItem(
+                    textoRepartidor
+            );
+
+            cmbFiltroRepartidor.addItem(
+                    textoRepartidor
             );
         }
+
+        cmbFiltroPedido.setSelectedIndex(0);
+        cmbFiltroRepartidor.setSelectedIndex(0);
+
+        cargandoFiltros = false;
     }
 
     private void cargarTabla() {
 
-        modeloTabla.setRowCount(
-                0
-        );
+        if (modeloTabla == null) {
+            return;
+        }
+
+        modeloTabla.setRowCount(0);
 
         List<Entrega> entregas =
                 entregaDAO.listarTodas();
 
+        int idPedidoFiltro = -1;
+        int idRepartidorFiltro = -1;
+
+        if (
+                cmbFiltroPedido != null
+                        && cmbFiltroPedido.getSelectedIndex() > 0
+        ) {
+
+            int indice =
+                    cmbFiltroPedido.getSelectedIndex() - 1;
+
+            if (
+                    indice >= 0
+                            && indice < pedidos.size()
+            ) {
+
+                idPedidoFiltro =
+                        pedidos
+                                .get(indice)
+                                .getId();
+            }
+        }
+
+        if (
+                cmbFiltroRepartidor != null
+                        && cmbFiltroRepartidor.getSelectedIndex() > 0
+        ) {
+
+            int indice =
+                    cmbFiltroRepartidor.getSelectedIndex() - 1;
+
+            if (
+                    indice >= 0
+                            && indice < repartidores.size()
+            ) {
+
+                idRepartidorFiltro =
+                        repartidores
+                                .get(indice)
+                                .getId();
+            }
+        }
+
         for (Entrega entrega : entregas) {
+
+            if (
+                    idPedidoFiltro != -1
+                            && entrega.getIdPedido()
+                            != idPedidoFiltro
+            ) {
+                continue;
+            }
+
+            if (
+                    idRepartidorFiltro != -1
+                            && entrega.getIdRepartidor()
+                            != idRepartidorFiltro
+            ) {
+                continue;
+            }
 
             String textoPedido =
                     obtenerTextoPedido(
@@ -496,15 +609,13 @@ public class VentanaGestionEntregas extends JFrame {
         ) {
 
             if (
-                    pedidos.get(i)
+                    pedidos
+                            .get(i)
                             .getId()
                             == idPedido
             ) {
 
-                cmbPedido.setSelectedIndex(
-                        i
-                );
-
+                cmbPedido.setSelectedIndex(i);
                 break;
             }
         }
@@ -521,15 +632,13 @@ public class VentanaGestionEntregas extends JFrame {
         ) {
 
             if (
-                    repartidores.get(i)
+                    repartidores
+                            .get(i)
                             .getId()
                             == idRepartidor
             ) {
 
-                cmbRepartidor.setSelectedIndex(
-                        i
-                );
-
+                cmbRepartidor.setSelectedIndex(i);
                 break;
             }
         }
@@ -553,12 +662,16 @@ public class VentanaGestionEntregas extends JFrame {
 
         LocalDate fecha =
                 LocalDate.parse(
-                        txtFecha.getText().trim()
+                        txtFecha
+                                .getText()
+                                .trim()
                 );
 
         LocalTime hora =
                 LocalTime.parse(
-                        txtHora.getText().trim()
+                        txtHora
+                                .getText()
+                                .trim()
                 );
 
         Entrega entrega =
@@ -569,11 +682,7 @@ public class VentanaGestionEntregas extends JFrame {
                         hora
                 );
 
-        if (
-                entregaDAO.guardar(
-                        entrega
-                )
-        ) {
+        if (entregaDAO.guardar(entrega)) {
 
             pedidoDAO.actualizarEstado(
                     pedido.getId(),
@@ -643,12 +752,16 @@ public class VentanaGestionEntregas extends JFrame {
 
         LocalDate fecha =
                 LocalDate.parse(
-                        txtFecha.getText().trim()
+                        txtFecha
+                                .getText()
+                                .trim()
                 );
 
         LocalTime hora =
                 LocalTime.parse(
-                        txtHora.getText().trim()
+                        txtHora
+                                .getText()
+                                .trim()
                 );
 
         Entrega entrega =
@@ -660,11 +773,7 @@ public class VentanaGestionEntregas extends JFrame {
                         hora
                 );
 
-        if (
-                entregaDAO.actualizar(
-                        entrega
-                )
-        ) {
+        if (entregaDAO.actualizar(entrega)) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -731,11 +840,7 @@ public class VentanaGestionEntregas extends JFrame {
             return;
         }
 
-        if (
-                entregaDAO.eliminar(
-                        id
-                )
-        ) {
+        if (entregaDAO.eliminar(id)) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -761,8 +866,7 @@ public class VentanaGestionEntregas extends JFrame {
 
         if (
                 pedidos.isEmpty()
-                        || cmbPedido.getSelectedIndex()
-                        == -1
+                        || cmbPedido.getSelectedIndex() == -1
         ) {
 
             JOptionPane.showMessageDialog(
@@ -777,8 +881,7 @@ public class VentanaGestionEntregas extends JFrame {
 
         if (
                 repartidores.isEmpty()
-                        || cmbRepartidor.getSelectedIndex()
-                        == -1
+                        || cmbRepartidor.getSelectedIndex() == -1
         ) {
 
             JOptionPane.showMessageDialog(
@@ -792,10 +895,12 @@ public class VentanaGestionEntregas extends JFrame {
         }
 
         if (
-                txtFecha.getText()
+                txtFecha
+                        .getText()
                         .trim()
                         .isEmpty()
-                        || txtHora.getText()
+                        || txtHora
+                        .getText()
                         .trim()
                         .isEmpty()
         ) {
@@ -813,7 +918,9 @@ public class VentanaGestionEntregas extends JFrame {
         try {
 
             LocalDate.parse(
-                    txtFecha.getText().trim()
+                    txtFecha
+                            .getText()
+                            .trim()
             );
 
         } catch (DateTimeParseException e) {
@@ -831,7 +938,9 @@ public class VentanaGestionEntregas extends JFrame {
         try {
 
             LocalTime.parse(
-                    txtHora.getText().trim()
+                    txtHora
+                            .getText()
+                            .trim()
             );
 
         } catch (DateTimeParseException e) {
@@ -862,7 +971,8 @@ public class VentanaGestionEntregas extends JFrame {
         }
 
         txtFecha.setText(
-                LocalDate.now().toString()
+                LocalDate.now()
+                        .toString()
         );
 
         txtHora.setText(

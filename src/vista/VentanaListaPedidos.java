@@ -21,6 +21,9 @@ public class VentanaListaPedidos extends JFrame {
     private JComboBox<String> cmbTipo;
     private JComboBox<EstadoPedido> cmbEstado;
 
+    private JComboBox<String> cmbFiltroTipo;
+    private JComboBox<String> cmbFiltroEstado;
+
     private JTable tablaPedidos;
     private DefaultTableModel modeloTabla;
 
@@ -35,7 +38,7 @@ public class VentanaListaPedidos extends JFrame {
         pedidoDAO = new PedidoDAO();
 
         setTitle("SpeedFast - Gestión de Pedidos");
-        setSize(850, 520);
+        setSize(900, 580);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -88,19 +91,13 @@ public class VentanaListaPedidos extends JFrame {
                 );
 
         JLabel lblDireccion =
-                new JLabel(
-                        "Dirección:"
-                );
+                new JLabel("Dirección:");
 
         JLabel lblTipo =
-                new JLabel(
-                        "Tipo:"
-                );
+                new JLabel("Tipo:");
 
         JLabel lblEstado =
-                new JLabel(
-                        "Estado:"
-                );
+                new JLabel("Estado:");
 
         txtDireccion =
                 new JTextField();
@@ -119,29 +116,63 @@ public class VentanaListaPedidos extends JFrame {
                         EstadoPedido.values()
                 );
 
-        panelFormulario.add(
-                lblDireccion
+        panelFormulario.add(lblDireccion);
+        panelFormulario.add(txtDireccion);
+
+        panelFormulario.add(lblTipo);
+        panelFormulario.add(cmbTipo);
+
+        panelFormulario.add(lblEstado);
+        panelFormulario.add(cmbEstado);
+
+        JPanel panelFiltros =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                4,
+                                10,
+                                10
+                        )
+                );
+
+        JLabel lblFiltroTipo =
+                new JLabel("Filtrar por tipo:");
+
+        JLabel lblFiltroEstado =
+                new JLabel("Filtrar por estado:");
+
+        cmbFiltroTipo =
+                new JComboBox<>(
+                        new String[]{
+                                "Todos",
+                                "Comida",
+                                "Encomienda",
+                                "Express"
+                        }
+                );
+
+        cmbFiltroEstado =
+                new JComboBox<>(
+                        new String[]{
+                                "Todos",
+                                "PENDIENTE",
+                                "EN_REPARTO",
+                                "ENTREGADO"
+                        }
+                );
+
+        cmbFiltroTipo.addActionListener(
+                e -> actualizarTabla()
         );
 
-        panelFormulario.add(
-                txtDireccion
+        cmbFiltroEstado.addActionListener(
+                e -> actualizarTabla()
         );
 
-        panelFormulario.add(
-                lblTipo
-        );
-
-        panelFormulario.add(
-                cmbTipo
-        );
-
-        panelFormulario.add(
-                lblEstado
-        );
-
-        panelFormulario.add(
-                cmbEstado
-        );
+        panelFiltros.add(lblFiltroTipo);
+        panelFiltros.add(cmbFiltroTipo);
+        panelFiltros.add(lblFiltroEstado);
+        panelFiltros.add(cmbFiltroEstado);
 
         JPanel panelSuperior =
                 new JPanel(
@@ -159,6 +190,11 @@ public class VentanaListaPedidos extends JFrame {
         panelSuperior.add(
                 panelFormulario,
                 BorderLayout.CENTER
+        );
+
+        panelSuperior.add(
+                panelFiltros,
+                BorderLayout.SOUTH
         );
 
         modeloTabla =
@@ -203,29 +239,19 @@ public class VentanaListaPedidos extends JFrame {
                 );
 
         btnRegistrar =
-                new JButton(
-                        "Registrar"
-                );
+                new JButton("Registrar");
 
         btnActualizar =
-                new JButton(
-                        "Actualizar"
-                );
+                new JButton("Actualizar");
 
         btnEliminar =
-                new JButton(
-                        "Eliminar"
-                );
+                new JButton("Eliminar");
 
         btnLimpiar =
-                new JButton(
-                        "Limpiar"
-                );
+                new JButton("Limpiar");
 
         btnVolver =
-                new JButton(
-                        "Volver"
-                );
+                new JButton("Volver");
 
         btnRegistrar.addActionListener(
                 e -> registrarPedido()
@@ -257,25 +283,11 @@ public class VentanaListaPedidos extends JFrame {
                         )
                 );
 
-        panelBotones.add(
-                btnRegistrar
-        );
-
-        panelBotones.add(
-                btnActualizar
-        );
-
-        panelBotones.add(
-                btnEliminar
-        );
-
-        panelBotones.add(
-                btnLimpiar
-        );
-
-        panelBotones.add(
-                btnVolver
-        );
+        panelBotones.add(btnRegistrar);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
+        panelBotones.add(btnVolver);
 
         panelPrincipal.add(
                 panelSuperior,
@@ -292,19 +304,29 @@ public class VentanaListaPedidos extends JFrame {
                 BorderLayout.SOUTH
         );
 
-        add(
-                panelPrincipal
-        );
+        add(panelPrincipal);
     }
 
     public void actualizarTabla() {
 
-        modeloTabla.setRowCount(
-                0
-        );
+        if (modeloTabla == null) {
+            return;
+        }
+
+        modeloTabla.setRowCount(0);
 
         List<Pedido> pedidos =
                 pedidoDAO.listarTodos();
+
+        String filtroTipo =
+                cmbFiltroTipo != null
+                        ? (String) cmbFiltroTipo.getSelectedItem()
+                        : "Todos";
+
+        String filtroEstado =
+                cmbFiltroEstado != null
+                        ? (String) cmbFiltroEstado.getSelectedItem()
+                        : "Todos";
 
         for (Pedido pedido : pedidos) {
 
@@ -316,6 +338,28 @@ public class VentanaListaPedidos extends JFrame {
                                     "Pedido",
                                     ""
                             );
+
+            String estado =
+                    pedido
+                            .getEstado()
+                            .name();
+
+            boolean cumpleTipo =
+                    filtroTipo == null
+                            || filtroTipo.equals("Todos")
+                            || filtroTipo.equals(tipo);
+
+            boolean cumpleEstado =
+                    filtroEstado == null
+                            || filtroEstado.equals("Todos")
+                            || filtroEstado.equals(estado);
+
+            if (
+                    !cumpleTipo
+                            || !cumpleEstado
+            ) {
+                continue;
+            }
 
             modeloTabla.addRow(
                     new Object[]{
@@ -355,9 +399,7 @@ public class VentanaListaPedidos extends JFrame {
                         )
                         .toString();
 
-        cmbTipo.setSelectedItem(
-                tipo
-        );
+        cmbTipo.setSelectedItem(tipo);
 
         String estado =
                 modeloTabla
@@ -407,15 +449,9 @@ public class VentanaListaPedidos extends JFrame {
                 (EstadoPedido)
                         cmbEstado.getSelectedItem();
 
-        pedido.setEstado(
-                estado
-        );
+        pedido.setEstado(estado);
 
-        if (
-                pedidoDAO.guardar(
-                        pedido
-                )
-        ) {
+        if (pedidoDAO.guardar(pedido)) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -496,15 +532,9 @@ public class VentanaListaPedidos extends JFrame {
                 (EstadoPedido)
                         cmbEstado.getSelectedItem();
 
-        pedido.setEstado(
-                estado
-        );
+        pedido.setEstado(estado);
 
-        if (
-                pedidoDAO.actualizar(
-                        pedido
-                )
-        ) {
+        if (pedidoDAO.actualizar(pedido)) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -572,11 +602,7 @@ public class VentanaListaPedidos extends JFrame {
             return;
         }
 
-        if (
-                pedidoDAO.eliminar(
-                        id
-                )
-        ) {
+        if (pedidoDAO.eliminar(id)) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -592,7 +618,8 @@ public class VentanaListaPedidos extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "No se pudo eliminar el pedido.",
+                    "No se pudo eliminar el pedido. "
+                            + "Verifique si está asociado a una entrega.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
@@ -648,13 +675,9 @@ public class VentanaListaPedidos extends JFrame {
 
         tablaPedidos.clearSelection();
 
-        txtDireccion.setText(
-                ""
-        );
+        txtDireccion.setText("");
 
-        cmbTipo.setSelectedIndex(
-                0
-        );
+        cmbTipo.setSelectedIndex(0);
 
         cmbEstado.setSelectedItem(
                 EstadoPedido.PENDIENTE
