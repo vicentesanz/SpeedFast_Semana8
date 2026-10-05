@@ -25,7 +25,7 @@ public class VentanaPrincipal extends JFrame {
     private final EntregaDAO entregaDAO;
 
     private JButton btnRegistrarPedido;
-    private JButton btnRegistrarRepartidor;
+    private JButton btnGestionarRepartidores;
     private JButton btnListarPedidos;
     private JButton btnIniciarEntrega;
     private JButton btnSalir;
@@ -127,9 +127,9 @@ public class VentanaPrincipal extends JFrame {
                         "Registrar Pedido"
                 );
 
-        btnRegistrarRepartidor =
+        btnGestionarRepartidores =
                 new JButton(
-                        "Registrar Repartidor"
+                        "Gestionar Repartidores"
                 );
 
         btnListarPedidos =
@@ -151,8 +151,8 @@ public class VentanaPrincipal extends JFrame {
                 e -> abrirRegistroPedido()
         );
 
-        btnRegistrarRepartidor.addActionListener(
-                e -> abrirRegistroRepartidor()
+        btnGestionarRepartidores.addActionListener(
+                e -> abrirGestionRepartidores()
         );
 
         btnListarPedidos.addActionListener(
@@ -172,7 +172,7 @@ public class VentanaPrincipal extends JFrame {
         );
 
         panelBotones.add(
-                btnRegistrarRepartidor
+                btnGestionarRepartidores
         );
 
         panelBotones.add(
@@ -214,12 +214,12 @@ public class VentanaPrincipal extends JFrame {
         );
     }
 
-    private void abrirRegistroRepartidor() {
+    private void abrirGestionRepartidores() {
 
-        VentanaRegistroRepartidor ventanaRegistro =
-                new VentanaRegistroRepartidor();
+        VentanaGestionRepartidores ventanaGestion =
+                new VentanaGestionRepartidores();
 
-        ventanaRegistro.setVisible(
+        ventanaGestion.setVisible(
                 true
         );
     }
