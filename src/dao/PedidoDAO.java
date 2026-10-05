@@ -199,6 +199,87 @@ public class PedidoDAO {
         return pedidos;
     }
 
+    public boolean actualizar(Pedido pedido) {
+
+        String sql =
+                "UPDATE pedido " +
+                        "SET direccion = ?, tipo = ?, estado = ? " +
+                        "WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setString(
+                    1,
+                    pedido.getDireccionEntrega()
+            );
+
+            statement.setString(
+                    2,
+                    obtenerTipo(pedido)
+            );
+
+            statement.setString(
+                    3,
+                    pedido.getEstado().name()
+            );
+
+            statement.setInt(
+                    4,
+                    pedido.getId()
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al actualizar el pedido: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
+    public boolean eliminar(int id) {
+
+        String sql =
+                "DELETE FROM pedido WHERE id = ?";
+
+        try (
+                Connection conexion = ConexionBD.conectar();
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    id
+            );
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Error al eliminar el pedido: "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+
     public boolean actualizarEstado(
             int idPedido,
             String nuevoEstado
